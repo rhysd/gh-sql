@@ -13,9 +13,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            exe: dist/linux-amd64
+          - os: macos-latest
+            exe: dist/darwin-amd64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - uses: cli/gh-extension-precompile@v1
+      - run: ./scripts/build.sh
+      - name: Upload release artifact
+        uses: softprops/action-gh-release@v1
         with:
-          build_script_override: "./scripts/build.sh"
+          draft: false
+          prerelease: false
+          files: ${{ matrix.exe }}
